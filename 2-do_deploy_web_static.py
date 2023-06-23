@@ -8,7 +8,7 @@ import re
 
 # Set the username and host for SSH connection to the server
 env.user = 'ubuntu'
-env.hosts = ['54.197.135.244', '54.167.3.103']
+env.hosts = ['107.20.111.173', '18.234.217.26']
 env.key_filename = '~/.ssh/id_rsa'
 
 
