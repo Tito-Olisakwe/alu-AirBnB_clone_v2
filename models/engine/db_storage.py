@@ -70,4 +70,4 @@ class DBStorage:
         self._session = None
         self._engine.dispose()
         self._engine = None
-        self._session = self._session()
+        self._session = scoped_session(session_factory)
