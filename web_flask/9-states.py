@@ -1,33 +1,53 @@
 #!/usr/bin/python3
-"""
-    python script that starts a Flask web application
-"""
-
+"""flask routes"""
+from flask import Flask,  render_template, render_template_string
 from models import storage
 from models.state import State
-from flask import Flask, render_template
+from models.city import City
+
 app = Flask(__name__)
 
 
-@app.route('/states')
-@app.route('/states/<id>')
-def states_list(id=None):
-    """
-        Return: HTML page with list of states
-    """
-    path = '9-states.html'
-    states = storage.all(State)
-    return render_template(path, states=states, id=id)
+@app.route('/states', strict_slashes=False)
+def states():
+    """return message with params"""
+    states = storage.all(State).values()
+    sorted_list = sorted(states, key=lambda x: x['name'])
+    return render_template('9-states.html',
+                           states=sorted_list)
+
+
+@app.route('/states/<state_id>', strict_slashes=False)
+def cities(state_id):
+    """return message with params"""
+    cities = storage.all(City).values()
+    sorted_list = sorted(cities, key=lambda x: x['name'])
+    filtered_list = [d for d in sorted_list if d['state_id'] == state_id]
+    states = storage.all(State).values()
+    state = [d for d in states if d['id'] == state_id]
+    if len(filtered_list) > 0 or len(state) > 0:
+
+        return render_template('9-cities.html',
+                               state=state[0], cities=filtered_list)
+    else:
+        return render_template_string("""<!DOCTYPE html>
+<HTML lang="en">
+    <HEAD>
+        <TITLE>HBNB</TITLE>
+    </HEAD>
+    <BODY>
+
+        <H1>Not found!</H1>
+
+    </BODY>
+</HTML>""")
 
 
 @app.teardown_appcontext
-def app_teardown(arg=None):
-    """
-        Clean-up session
-    """
+def teardown(self):
+    """Removes the current SQLAlchemy Session"""
     storage.close()
 
 
-if __name__ == '__main__':
-    app.url_map.strict_slashes = False
+if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)
