@@ -70,4 +70,6 @@ class DBStorage:
         self._session = None
         self._engine.dispose()
         self._engine = None
+        session_factory = sessionmaker(bind=self._engine,
+                                       expire_on_commit=False)
         self._session = scoped_session(session_factory)
